@@ -146,6 +146,19 @@ git checkout -b task1-engine     # أو task2-terrain / task3-core / task4-ui
 - `main` لازم تشتغل دايمًا. أي merge بيكسرها يترجع فورًا.
 - متعدّلش فولدر حد تاني. محتاج تغيير؟ اطلبه.
 
+### هوية الـ commit — مرة واحدة بعد الـ clone
+
+```bash
+git config user.name  "اسمك"
+git config user.email "إيميلك على GitHub"
+```
+
+من غيرها الكوميتات بتتسجل باسم حد تاني ومش بتتحسب لك في الريبو.
+لو مش عارف الإيميل: GitHub → Settings → Emails → خد `…+username@users.noreply.github.com`.
+
+**الـ push محتاج مفتاح SSH أو token** — الباسورد مش هينفع.
+أسهل طريقة: GitHub Desktop، أو `gh auth login`، أو مفتاح SSH من Settings → SSH keys.
+
 **كل يوم:** standup 10 دقايق — عملت إيه / هعمل إيه / واقف في إيه.
 
 ---
