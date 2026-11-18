@@ -57,11 +57,22 @@ def draw_moon(cv, cx, cy, r):
     circle_direct(cv, cx, cy, r + 5, C.MOON_RING)
 
 
-def build_background(cv, terrain):
+def build_sky(cv):
     draw_sky(cv)
     draw_stars(cv)
     draw_moon(cv, 520, 72, 18)
+
+
+def rebuild_background(cv, terrain, sky):
+    """Rebuild the cached background after the terrain changed.
+
+    Restoring the sky first matters: without it the old terrain would still be
+    underneath and painting the new one on top would leave a ghost of the
+    crater. Called once per explosion, never per frame (~45 ms).
+    """
+    cv.restore(sky)
     terrain.render(cv)
+    return cv.snapshot()
 
 
 # --- dynamic layer --------------------------------------------------------
@@ -127,8 +138,9 @@ def main(argv):
     canvas = Canvas(C.WIDTH, C.HEIGHT)
     terrain = Terrain(C.WIDTH, C.HEIGHT)
 
-    build_background(canvas, terrain)
-    background = canvas.snapshot()
+    build_sky(canvas)
+    sky = canvas.snapshot()
+    background = rebuild_background(canvas, terrain, sky)
 
     tanks = [
         {"x": 118, "angle": 45.0, "color": C.P1},

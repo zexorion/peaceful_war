@@ -74,9 +74,20 @@ terrain = Terrain(width, height, seed)
 terrain.w, terrain.h, terrain.heights        # heights[x] = surface y
 terrain.height_at(x) -> int
 terrain.is_solid(x, y) -> bool
-terrain.render(cv)                           # الترسم once into background
-terrain.carve(cx, cy, r)                     # حفرة: تعدّل heights
+terrain.render(cv)                           # رسم التضاريس فوق اللي موجود
+terrain.carve(cx, cy, r) -> (x0, x1)         # حفرة: تعدّل heights وترجع المدى المتأثر
 ```
+
+**بعد كل حفرة (تكامل Task 2 + Task 3):** التضاريس بتترسم فوق الـ sky snapshot، مش فوق الصورة القديمة:
+
+```python
+sky = ...                      # snapshot للسما والنجوم والقمر (ثابت)
+terrain.carve(cx, cy, r)
+background = rebuild_background(cv, terrain, sky)   # موجودة في main.py
+```
+
+من غير `restore(sky)` الأول، التضاريس القديمة هتفضل تحت وباينة كشبح حوالين الحفرة.
+التكلفة ~45ms وبتتنفذ **مرة واحدة لكل انفجار**، مش كل فريم.
 
 ### Task 3
 
