@@ -19,7 +19,7 @@ python3 -m venv .venv
 - لقطة من غير نافذة: `.venv/bin/python main.py --shot out/slice0.png`
 - الاختبارات: `.venv/bin/python -m unittest discover -s tests -t .`
 
-> **الوضع الحالي: Slice 0 (هيكل شغال).** النافذة + Canvas + تضاريس + دبابتين + خط تصويب + HUD.
+> **الوضع الحالي: Slice 0 (هيكل شغال).** النافذة + Canvas + تضاريس + دبابتين + HUD.
 > مش اللعبة بعد — دي نقطة البداية اللي كل تاسك هيبني عليها. شوف [PLAN.md](PLAN.md).
 
 ---
@@ -33,8 +33,8 @@ core/
   display.py         pygame: النافذة، التكبير، الفولسكرين، النص
   util.py            clamp / lerp / rotate
 algo/
-  lines.py           Ch2 — Bresenham + DDA منقّط
-  circles.py         Ch3 — Direct (fallback) + disc
+  lines.py           Ch2 — Bresenham فقط (Direct + DDA + المنقّط: Task 1)
+  circles.py         Ch3 — فاضي عمدًا: Task 1 بيكتبه كله
   curves.py          Ch4 — يبدأ فاضي (Task 2)
   fill.py            Ch5 — يبدأ فاضي (Task 2)
 world/

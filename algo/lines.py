@@ -1,11 +1,13 @@
 """Chapter 2 — line drawing.
 
-The scaffold ships two of them because Slice 0 needs them:
-  * line_bresenham  — every straight edge in the game,
-  * line_dda_dotted — the dotted aiming guide.
+Only Bresenham ships here, because the tanks need *some* line to be visible on
+day one.
 
-Task 1 still owns this file: it adds the Direct method, the plain DDA, the
-performance table for the Algorithms Lab, and the unit tests.
+Task 1 owns this file and writes the rest — from the book, not from memory:
+  line_direct(cv, x0, y0, x1, y1, color)             # naive y = mx + b
+  line_dda(cv, x0, y0, x1, y1, color)                # DDA
+  line_dda_dotted(cv, x0, y0, x1, y1, color, gap=4)  # dotted aim guide
+plus their tests and their rows in the benchmark table.
 """
 
 
@@ -33,26 +35,3 @@ def line_bresenham(cv, x0, y0, x1, y1, color):
         if e2 <= dx:
             err += dx
             y0 += sy
-
-
-def line_dda_dotted(cv, x0, y0, x1, y1, color, gap=4):
-    """DDA stepped on the major axis, plotting one pixel every `gap` steps (Ch2).
-
-    Used for the aim guide and the trajectory preview.
-    """
-    dx = int(x1) - int(x0)
-    dy = int(y1) - int(y0)
-    steps = max(abs(dx), abs(dy))
-    if steps == 0:
-        cv.set_pixel(x0, y0, color)
-        return
-
-    xinc = dx / steps
-    yinc = dy / steps
-    x = float(x0)
-    y = float(y0)
-    for i in range(steps + 1):
-        if i % gap == 0:
-            cv.set_pixel(round(x), round(y), color)
-        x += xinc
-        y += yinc

@@ -43,16 +43,19 @@ cv.restore(snap)                        # one C-level copy
 
 ```python
 # algo/lines.py — Ch2
-line_bresenham(cv, x0, y0, x1, y1, color)
-line_dda_dotted(cv, x0, y0, x1, y1, color, gap=4)
-# يضيف: line_direct(cv, ..., color) · line_dda(cv, ..., color)
+line_bresenham(cv, x0, y0, x1, y1, color)   # الموجود الوحيد
+# يضيف: line_direct(...) · line_dda(...) · line_dda_dotted(..., gap=4)
 
 # algo/circles.py — Ch3
-circle_direct(cv, cx, cy, r, color)     # fallback
-disc_spans(cv, cx, cy, r, color)
-disc_blend(cv, cx, cy, r, color, alpha)
-# يضيف: circle_midpoint(...) · ellipse_midpoint(cv, cx, cy, rx, ry, color) · circle_polar(...)
+# فاضي عمدًا. Task 1 يكتب من الكتاب:
+# circle_midpoint(cv, cx, cy, r, color)
+# disc_midpoint(cv, cx, cy, r, color)
+# ellipse_midpoint(cv, cx, cy, rx, ry, color)
+# circle_polar(cv, cx, cy, r, color)
 ```
+
+> **ليه فاضي؟** القمر، حلقات الانفجار، وظل الدبابة كلهم دواير. لو سيبنا نسخة جاهزة
+> هتتنسخ وهتبقى مش شغل التيم. فـ Slice 0 مافيهوش قمر ولا انفجار — بالتصميم.
 
 ### Task 2
 

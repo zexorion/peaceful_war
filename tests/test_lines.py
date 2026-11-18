@@ -1,8 +1,9 @@
-"""Chapter 2 line tests. Task 1 extends these as it adds Direct and plain DDA."""
+"""Chapter 2 line tests. Task 1 extends these as it adds Direct, DDA and the
+dotted DDA variant."""
 
 import unittest
 
-from algo.lines import line_bresenham, line_dda_dotted
+from algo.lines import line_bresenham
 
 
 class Recorder:
@@ -49,18 +50,6 @@ class BresenhamTest(unittest.TestCase):
     def test_horizontal_and_vertical(self):
         self.assertEqual(draw(0, 5, 4, 5), [(0, 5), (1, 5), (2, 5), (3, 5), (4, 5)])
         self.assertEqual(draw(2, 0, 2, 3), [(2, 0), (2, 1), (2, 2), (2, 3)])
-
-
-class DottedDdaTest(unittest.TestCase):
-    def test_dots_are_dotted(self):
-        cv = Recorder()
-        line_dda_dotted(cv, 0, 0, 40, 0, (255, 255, 255), gap=4)
-        self.assertEqual(len(cv.points), 11)  # 41 steps, every 4th
-
-    def test_dots_start_at_the_muzzle(self):
-        cv = Recorder()
-        line_dda_dotted(cv, 7, 3, 30, 20, (255, 255, 255), gap=4)
-        self.assertEqual(cv.points[0], (7, 3))
 
 
 if __name__ == "__main__":

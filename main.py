@@ -6,10 +6,14 @@ This is a smoke test for the architecture, not the game yet:
 
 It proves four things on day one:
   1. the Canvas is the only thing writing pixels,
-  2. the static background (sky, stars, moon, terrain) can be cached and
+  2. the static background (sky, stars, terrain) can be cached and
      restored in one copy, so per-frame cost stays tiny,
   3. 640x360 scales x2 windowed and x3 fullscreen with no blur,
   4. text is the single agreed exception (pygame.font, at display size).
+
+There is no moon and no aim guide yet: those are circles and dotted lines,
+and Task 1 writes every circle and every DDA line in this project. Slice 0
+deliberately does not ship them.
 
 Owner: Task 3 (game core + integration). Task 1 and Task 2 replace the
 drawing calls inside it as their modules land.
@@ -27,8 +31,7 @@ import sys
 import pygame
 
 import config as C
-from algo.circles import circle_direct, disc_blend, disc_spans
-from algo.lines import line_bresenham, line_dda_dotted
+from algo.lines import line_bresenham
 from core.canvas import Canvas
 from core.display import Display
 from core.util import clamp, lerp_color
@@ -50,17 +53,9 @@ def draw_stars(cv, count=90, seed=3):
         cv.blend_pixel(x, y, C.STAR, rng.randrange(60, 220))
 
 
-def draw_moon(cv, cx, cy, r):
-    for rr, alpha in ((r + 16, 16), (r + 9, 24), (r + 4, 38)):
-        disc_blend(cv, cx, cy, rr, C.MOON_RING, alpha)
-    disc_spans(cv, cx, cy, r, C.MOON)
-    circle_direct(cv, cx, cy, r + 5, C.MOON_RING)
-
-
 def build_sky(cv):
     draw_sky(cv)
     draw_stars(cv)
-    draw_moon(cv, 520, 72, 18)
 
 
 def rebuild_background(cv, terrain, sky):
@@ -97,19 +92,6 @@ def draw_world(cv, background, terrain, tanks):
         x = tank["x"]
         y = terrain.height_at(x)
         draw_tank(cv, x, y, tank["angle"], tank["color"])
-
-        rad = math.radians(tank["angle"])
-        mx = x + math.cos(rad) * 12
-        my = y - 12 - math.sin(rad) * 12
-        line_dda_dotted(
-            cv,
-            mx,
-            my,
-            mx + math.cos(rad) * 46,
-            my - math.sin(rad) * 46,
-            C.AIM,
-            gap=4,
-        )
 
 
 def hud(tanks, power):
