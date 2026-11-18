@@ -1,0 +1,3 @@
+# pygame-ce is the maintained fork and imports as `pygame`.
+# Plain `pygame==2.6.1` also works on Python 3.11-3.13; on 3.14 its font module is broken.
+pygame-ce==2.5.8
