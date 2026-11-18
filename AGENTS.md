@@ -1,6 +1,6 @@
 # AGENTS.md — قواعد الشغل في الريبو
 
-اقرأ بالترتيب: [`PLAN.md`](PLAN.md) → [`docs/CONTRACT.md`](docs/CONTRACT.md) → [`docs/TASKS.md`](docs/TASKS.md).
+اقرأ بالترتيب: [`docs/TEAM.md`](docs/TEAM.md) → [`PLAN.md`](PLAN.md) → [`docs/CONTRACT.md`](docs/CONTRACT.md) → [`docs/TASKS.md`](docs/TASKS.md).
 
 ## الحالة
 

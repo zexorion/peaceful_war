@@ -10,6 +10,18 @@
 والشرط الأساسي: *كل بكسل على الشاشة مكتوب بخوارزميات من الكتاب* — ممنوع أي دالة رسم جاهزة.
 
 *١) شغّلوا المشروع*
+
+▸ *ويندوز (PowerShell أو CMD):*
+```
+git clone https://github.com/zexorion/peaceful_war.git
+cd peaceful_war
+py -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe main.py
+```
+(لو `py` مش موجود استخدم `python` بدالها — ومش محتاج تفعّل الـ venv)
+
+▸ *لينكس / ماك:*
 ```
 git clone https://github.com/zexorion/peaceful_war.git
 cd peaceful_war
@@ -17,16 +29,17 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python main.py
 ```
-ويندوز: آخر سطرين يبقوا
+
+▸ *لقطة + تست (ويندوز):*
 ```
-.venv\Scripts\pip install -r requirements.txt
-.venv\Scripts\python main.py
+.venv\Scripts\python.exe main.py --shot out\slice0.png
+.venv\Scripts\python.exe -m unittest discover -s tests -t .
 ```
 
 *٢) اقرأوا بالترتيب*
-1. `README.md` — التشغيل والهيكل
-2. `docs/CONTRACT.md` — العقد التقني (إلزامي قبل أي كود)
-3. `PLAN.md` — القرارات والجدول
+1. docs/TEAM.md — دليل الفريق كامل (ابدأ من هنا)
+2. docs/CONTRACT.md — العقد التقني (إلزامي قبل أي كود)
+3. PLAN.md — القرارات والجدول
 
 *٣) اللي هتشوفوه إيه*
 ماكيت (Slice 0) — الشاشة والرسم شغالين، بس مفيش لعب لسه.
