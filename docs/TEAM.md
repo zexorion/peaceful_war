@@ -102,6 +102,8 @@ python3 -m venv .venv
 
 ## 5. التقسيم — 4 تاسكات × فردين
 
+> **للاختيار السريع:** شوف [`docs/TASKS_BRIEF.md`](TASKS_BRIEF.md) — صفحة واحدة فيها الأربعة تاسكات باختصار.
+
 | Task | الشغل | الملفات | أول مهمة | الصعوبة |
 |---|---|---|---|---|
 | **1 — أدوات الرسم** | Direct · DDA · Bresenham · Midpoint Circle/Ellipse · Polar + الـ benchmark | `core/util.py` · `algo/lines.py` · `algo/circles.py` · `tests/` | اكتبوا Direct + DDA | ★★☆ |
@@ -213,5 +215,6 @@ git config user.email "إيميلك على GitHub"
 | [`README.md`](../README.md) | التشغيل والهيكل |
 | [`PLAN.md`](../PLAN.md) | القرارات · الـ scope · الجدول · المخاطر |
 | [`docs/CONTRACT.md`](CONTRACT.md) | التوقيعات وقواعد الكود — **إلزامي** |
+| [`docs/TASKS_BRIEF.md`](TASKS_BRIEF.md) | التاسكات الأربعة باختصار — **للاختيار** |
 | [`docs/TASKS.md`](TASKS.md) | كل تاسك بالتفصيل |
 | [`docs/REPORT.md`](REPORT.md) | التقرير — كل تاسك بيكتب فيه أول بأول |

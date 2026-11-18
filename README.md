@@ -49,6 +49,7 @@ tests/               unittest لكل موديول
 assets/              خطوط/أيقونات/لقطات
 docs/
   CONTRACT.md        العقد التقني بين الفرق — يُقرأ قبل أي كود
+  TASKS_BRIEF.md     التاسكات الأربعة باختصار — للاختيار
   TASKS.md           تقسيم الشغل 4×2 بالتفصيل
 ```
 
@@ -64,6 +65,7 @@ docs/
 ## المستندات
 
 - **[PLAN.md](PLAN.md)** — القرارات، الـ scope، التقسيم، الجدول، المخاطر.
+- **[docs/TASKS_BRIEF.md](docs/TASKS_BRIEF.md)** — التاسكات الأربعة في صفحة واحدة (للاختيار).
 - **[docs/TASKS.md](docs/TASKS.md)** — ورق كل تاسك (يتنسخ للجروب زي ما هو).
 - **[docs/CONTRACT.md](docs/CONTRACT.md)** — التوقيعات وقواعد الكود. **إلزامي.**
 
