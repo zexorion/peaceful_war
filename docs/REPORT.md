@@ -39,6 +39,12 @@ Input → Game Core (state: terrain, tanks, projectile)
 
 ## 4. تفاصيل كل خوارزمية
 
+### 4.1 — UI System & Panel Composition — Ch6 (Point Clipping & Alpha Blending)
+- **الفكرة:** رسم لوحات الواجهة وشاشات البداية والـ HUD والـ Lab باستخدام بكسلات الـ Canvas الصافية دون أي مكتبات خارجية، مع استخدام `blend_pixel` للشفافية و`line_bresenham` وحدود الصناديق.
+- **التعقيد:** O(W * H) لكل لوحة مع Clipping تلقائي عند أطراف الشاشة 640×360.
+- **في اللعبة:** شاشة البداية (TitleScreen)، شاشة التعليمات (HowToPlayScreen)، شاشة معمل المقارنة (LabScreen)، أشرطة الـ HP ومؤشر الرياح في الـ HUD، وقوائم التوقف والفوز.
+- **كتبها:** Task 4 (UI/UX & Delivery)
+
 ### 4.x — (اسم الخوارزمية) — Ch?
 - **الفكرة:**
 - **التعقيد:** O(...)
