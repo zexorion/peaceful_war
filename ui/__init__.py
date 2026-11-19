@@ -29,6 +29,12 @@ from ui.hud import HUD
 from ui.pause import PauseOverlay
 from ui.game_over import GameOverScreen
 from ui.lab import LabScreen
+from ui.art import (
+    draw_scenic_sunset_sky,
+    generate_scenic_valley_heights,
+    render_scenic_valley_terrain,
+    draw_scenic_tank,
+)
 
 __all__ = [
     "FONT_SMALL",
@@ -54,4 +60,8 @@ __all__ = [
     "PauseOverlay",
     "GameOverScreen",
     "LabScreen",
+    "draw_scenic_sunset_sky",
+    "generate_scenic_valley_heights",
+    "render_scenic_valley_terrain",
+    "draw_scenic_tank",
 ]

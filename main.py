@@ -36,56 +36,39 @@ from ui import (
     PauseOverlay,
     GameOverScreen,
     LabScreen,
+    draw_scenic_sunset_sky,
+    generate_scenic_valley_heights,
+    render_scenic_valley_terrain,
+    draw_scenic_tank,
 )
 
 
 # --- static background ----------------------------------------------------
-def draw_sky(cv):
-    for y in range(cv.h):
-        t = (y / (cv.h - 1)) ** 1.35
-        cv.hline(0, cv.w - 1, y, lerp_color(C.SKY_TOP, C.SKY_BOTTOM, t))
-
-
-def draw_stars(cv, count=90, seed=3):
-    rng = random.Random(seed)
-    for _ in range(count):
-        x = rng.randrange(cv.w)
-        y = rng.randrange(int(cv.h * 0.62))
-        cv.blend_pixel(x, y, C.STAR, rng.randrange(60, 220))
-
-
 def build_sky(cv):
-    draw_sky(cv)
-    draw_stars(cv)
+    draw_scenic_sunset_sky(cv)
 
 
 def rebuild_background(cv, terrain, sky):
     cv.restore(sky)
-    terrain.render(cv)
+    render_scenic_valley_terrain(cv, terrain.heights)
     return cv.snapshot()
 
 
 # --- dynamic layer --------------------------------------------------------
 def draw_tank(cv, x, y, angle, color):
-    x = int(x)
-    y = int(y)
-    cv.rect(x - 11, y - 5, 22, 5, C.TRACK)
-    for tx in range(x - 10, x + 10, 4):
-        cv.set_pixel(tx, y - 4, (58, 48, 56))
-    cv.rect(x - 8, y - 9, 16, 4, color)
-    cv.rect(x - 3, y - 12, 6, 3, color)
-
-    rad = math.radians(angle)
-    bx = x + math.cos(rad) * 12
-    by = y - 12 - math.sin(rad) * 12
-    line_bresenham(cv, x, y - 11, bx, by, color)
+    is_p1 = (color == C.P1)
+    draw_scenic_tank(cv, x, y, angle, is_p1=is_p1)
 
 
 def draw_world(cv, background, terrain, tanks):
     cv.restore(background)
     for tank in tanks:
         x = tank["x"]
-        y = terrain.height_at(x)
+        y = max(
+            terrain.height_at(x - 12),
+            terrain.height_at(x + 12),
+            terrain.height_at(x),
+        )
         draw_tank(cv, x, y, tank["angle"], tank["color"])
 
 
@@ -100,6 +83,7 @@ def main(argv):
     display = Display("Peaceful War", C.WIDTH, C.HEIGHT, C.WINDOW_SCALE)
     canvas = Canvas(C.WIDTH, C.HEIGHT)
     terrain = Terrain(C.WIDTH, C.HEIGHT)
+    terrain.heights = generate_scenic_valley_heights(C.WIDTH, C.HEIGHT)
 
     build_sky(canvas)
     sky = canvas.snapshot()
@@ -113,8 +97,8 @@ def main(argv):
     pause_overlay = PauseOverlay()
 
     tanks = [
-        {"x": 118, "angle": 45.0, "color": C.P1, "hp": 100},
-        {"x": 522, "angle": 135.0, "color": C.P2, "hp": 100},
+        {"x": 110, "angle": 35.0, "color": C.P1, "hp": 100},
+        {"x": 530, "angle": 145.0, "color": C.P2, "hp": 100},
     ]
     power = 55
     weapon = "SHELL"
