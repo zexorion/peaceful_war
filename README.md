@@ -50,6 +50,7 @@ assets/              خطوط/أيقونات/لقطات
 docs/
   CONTRACT.md        العقد التقني بين الفرق — يُقرأ قبل أي كود
   TASKS_BRIEF.md     التاسكات الأربعة باختصار — للاختيار
+  KICKOFF.md         أجندة الـ kickoff + ورقة التوزيع (للقائد)
   TASKS.md           تقسيم الشغل 4×2 بالتفصيل
 ```
 
@@ -66,6 +67,7 @@ docs/
 
 - **[PLAN.md](PLAN.md)** — القرارات، الـ scope، التقسيم، الجدول، المخاطر.
 - **[docs/TASKS_BRIEF.md](docs/TASKS_BRIEF.md)** — التاسكات الأربعة في صفحة واحدة (للاختيار).
+- **[docs/KICKOFF.md](docs/KICKOFF.md)** — أجندة 30 دقيقة + ورقة التوزيع + أول commit لكل تاسك.
 - **[docs/TASKS.md](docs/TASKS.md)** — ورق كل تاسك (يتنسخ للجروب زي ما هو).
 - **[docs/CONTRACT.md](docs/CONTRACT.md)** — التوقيعات وقواعد الكود. **إلزامي.**
 
