@@ -1,26 +1,19 @@
-"""Peaceful War — Slice 0 (boot scene).
+"""Peaceful War — Slice 0 + UI System.
 
-This is a smoke test for the architecture, not the game yet:
+Controls:
+  TITLE / MENUS:
+    UP / DOWN : Navigate options
+    ENTER / SPACE : Select option
+    ESC : Back / Exit
+  MATCH:
+    LEFT / RIGHT : Aim angle
+    UP / DOWN : Adjust power
+    TAB : Switch weapon (Shell / Laser)
+    ESC : Pause menu
+    F11 : Fullscreen toggle
 
-    one window  ->  one Canvas  ->  our own pixels  ->  Display
-
-It proves four things on day one:
-  1. the Canvas is the only thing writing pixels,
-  2. the static background (sky, stars, terrain) can be cached and
-     restored in one copy, so per-frame cost stays tiny,
-  3. 640x360 scales x2 windowed and x3 fullscreen with no blur,
-  4. text is the single agreed exception (pygame.font, at display size).
-
-There is no moon and no aim guide yet: those are circles and dotted lines,
-and Task 1 writes every circle and every DDA line in this project. Slice 0
-deliberately does not ship them.
-
-Owner: Task 3 (game core + integration). Task 1 and Task 2 replace the
-drawing calls inside it as their modules land.
-
-Controls:  LEFT / RIGHT aim  ·  F11 fullscreen  ·  ESC quit
-Run:       .venv/bin/python main.py
-Screenshot: .venv/bin/python main.py --shot out/slice0.png
+Run:        .venv/Scripts/python.exe main.py
+Screenshot: .venv/Scripts/python.exe main.py --shot out/screen.png [--screen title|play|lab|help]
 """
 
 import math
@@ -36,6 +29,14 @@ from core.canvas import Canvas
 from core.display import Display
 from core.util import clamp, lerp_color
 from world.terrain import Terrain
+from ui import (
+    TitleScreen,
+    HowToPlayScreen,
+    HUD,
+    PauseOverlay,
+    GameOverScreen,
+    LabScreen,
+)
 
 
 # --- static background ----------------------------------------------------
@@ -59,12 +60,6 @@ def build_sky(cv):
 
 
 def rebuild_background(cv, terrain, sky):
-    """Rebuild the cached background after the terrain changed.
-
-    Restoring the sky first matters: without it the old terrain would still be
-    underneath and painting the new one on top would leave a ghost of the
-    crater. Called once per explosion, never per frame (~45 ms).
-    """
     cv.restore(sky)
     terrain.render(cv)
     return cv.snapshot()
@@ -94,29 +89,15 @@ def draw_world(cv, background, terrain, tanks):
         draw_tank(cv, x, y, tank["angle"], tank["color"])
 
 
-def hud(tanks, power):
-    return [
-        ("P1", 12, 10, C.DIM, 10, "topleft"),
-        ("P2", C.WIDTH - 12, 10, C.DIM, 10, "topright"),
-        ("WIND 9", C.WIDTH // 2, 10, C.INK, 10, "midtop"),
-        (
-            "ANG %d  POW %d" % (int(tanks[0]["angle"]), power),
-            12,
-            C.HEIGHT - 10,
-            C.INK,
-            10,
-            "bottomleft",
-        ),
-        ("SHELL", C.WIDTH - 12, C.HEIGHT - 10, C.INK, 10, "bottomright"),
-    ]
-
-
 def main(argv):
     shot = None
+    target_screen = "title"
     if "--shot" in argv:
         shot = argv[argv.index("--shot") + 1]
+    if "--screen" in argv:
+        target_screen = argv[argv.index("--screen") + 1].lower()
 
-    display = Display("Peaceful War — Slice 0", C.WIDTH, C.HEIGHT, C.WINDOW_SCALE)
+    display = Display("Peaceful War", C.WIDTH, C.HEIGHT, C.WINDOW_SCALE)
     canvas = Canvas(C.WIDTH, C.HEIGHT)
     terrain = Terrain(C.WIDTH, C.HEIGHT)
 
@@ -124,42 +105,179 @@ def main(argv):
     sky = canvas.snapshot()
     background = rebuild_background(canvas, terrain, sky)
 
+    # UI Screens
+    title_screen = TitleScreen()
+    how_to_play_screen = HowToPlayScreen()
+    lab_screen = LabScreen()
+    hud_overlay = HUD()
+    pause_overlay = PauseOverlay()
+
     tanks = [
-        {"x": 118, "angle": 45.0, "color": C.P1},
-        {"x": 522, "angle": 135.0, "color": C.P2},
+        {"x": 118, "angle": 45.0, "color": C.P1, "hp": 100},
+        {"x": 522, "angle": 135.0, "color": C.P2, "hp": 100},
     ]
     power = 55
+    weapon = "SHELL"
+    wind = 4
+    state_mode = "TITLE"  # TITLE | HOW_TO_PLAY | LAB | MATCH | PAUSE
 
+    # Headless screenshot generator
     if shot:
-        draw_world(canvas, background, terrain, tanks)
-        display.present(canvas, hud(tanks, power))
+        if target_screen == "title":
+            canvas.restore(sky)
+            texts = title_screen.draw(canvas)
+        elif target_screen == "help":
+            canvas.restore(background)
+            texts = how_to_play_screen.draw(canvas)
+        elif target_screen == "lab":
+            canvas.restore(background)
+            texts = lab_screen.draw(canvas)
+        else:  # hud / play
+            draw_world(canvas, background, terrain, tanks)
+            hud_data = {
+                "turn": 0,
+                "p1_hp": tanks[0]["hp"],
+                "p2_hp": tanks[1]["hp"],
+                "angle": tanks[0]["angle"],
+                "power": power,
+                "wind": wind,
+                "weapon": weapon,
+            }
+            texts = hud_overlay.draw(canvas, hud_data)
+
+        display.present(canvas, texts)
         os.makedirs(os.path.dirname(shot) or ".", exist_ok=True)
         display.save(shot)
         display.close()
         print("saved", shot)
         return 0
 
-    print("LEFT/RIGHT aim · F11 fullscreen · ESC quit")
+    print("Title Screen active: UP/DOWN navigate, ENTER select, ESC exit.")
     clock = pygame.time.Clock()
     running = True
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-                elif event.key == pygame.K_F11:
+                if event.key == pygame.K_F11:
                     display.toggle_fullscreen()
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            tanks[0]["angle"] = clamp(tanks[0]["angle"] + 2, 1, 179)
-        if keys[pygame.K_RIGHT]:
-            tanks[0]["angle"] = clamp(tanks[0]["angle"] - 2, 1, 179)
+                # Title Screen Controls
+                elif state_mode == "TITLE":
+                    if event.key == pygame.K_UP:
+                        title_screen.prev_option()
+                    elif event.key == pygame.K_DOWN:
+                        title_screen.next_option()
+                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                        chosen = title_screen.OPTIONS[title_screen.selected][0]
+                        if chosen == "PLAY":
+                            state_mode = "MATCH"
+                        elif chosen == "HOW TO PLAY":
+                            state_mode = "HOW_TO_PLAY"
+                        elif chosen == "ALGORITHMS LAB":
+                            state_mode = "LAB"
+                        elif chosen == "QUIT":
+                            running = False
+                    elif event.key == pygame.K_ESCAPE:
+                        running = False
 
-        draw_world(canvas, background, terrain, tanks)
-        display.present(canvas, hud(tanks, power))
+                # How to Play Controls
+                elif state_mode == "HOW_TO_PLAY":
+                    if event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
+                        state_mode = "TITLE"
+
+                # Algorithms Lab Controls
+                elif state_mode == "LAB":
+                    if event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
+                        state_mode = "TITLE"
+
+                # Match Controls
+                elif state_mode == "MATCH":
+                    if event.key == pygame.K_ESCAPE:
+                        state_mode = "PAUSE"
+                    elif event.key == pygame.K_TAB:
+                        weapon = "LASER" if weapon == "SHELL" else "SHELL"
+
+                # Pause Controls
+                elif state_mode == "PAUSE":
+                    if event.key == pygame.K_UP:
+                        pause_overlay.prev_option()
+                    elif event.key == pygame.K_DOWN:
+                        pause_overlay.next_option()
+                    elif event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                        chosen = pause_overlay.OPTIONS[pause_overlay.selected]
+                        if chosen == "RESUME MATCH":
+                            state_mode = "MATCH"
+                        elif chosen == "RESTART MATCH":
+                            tanks[0]["hp"] = 100
+                            tanks[1]["hp"] = 100
+                            power = 55
+                            state_mode = "MATCH"
+                        elif chosen == "MAIN MENU":
+                            state_mode = "TITLE"
+                    elif event.key == pygame.K_ESCAPE:
+                        state_mode = "MATCH"
+
+        # Continuous keys (in MATCH)
+        if state_mode == "MATCH":
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                tanks[0]["angle"] = clamp(tanks[0]["angle"] + 2, 1, 179)
+            if keys[pygame.K_RIGHT]:
+                tanks[0]["angle"] = clamp(tanks[0]["angle"] - 2, 1, 179)
+            if keys[pygame.K_UP]:
+                power = int(clamp(power + 1, 10, 100))
+            if keys[pygame.K_DOWN]:
+                power = int(clamp(power - 1, 10, 100))
+
+        # Render current state
+        if state_mode == "TITLE":
+            canvas.restore(sky)
+            title_screen.update()
+            texts = title_screen.draw(canvas)
+            display.present(canvas, texts)
+
+        elif state_mode == "HOW_TO_PLAY":
+            canvas.restore(background)
+            texts = how_to_play_screen.draw(canvas)
+            display.present(canvas, texts)
+
+        elif state_mode == "LAB":
+            canvas.restore(background)
+            texts = lab_screen.draw(canvas)
+            display.present(canvas, texts)
+
+        elif state_mode == "MATCH":
+            draw_world(canvas, background, terrain, tanks)
+            hud_data = {
+                "turn": 0,
+                "p1_hp": tanks[0]["hp"],
+                "p2_hp": tanks[1]["hp"],
+                "angle": tanks[0]["angle"],
+                "power": power,
+                "wind": wind,
+                "weapon": weapon,
+            }
+            texts = hud_overlay.draw(canvas, hud_data)
+            display.present(canvas, texts)
+
+        elif state_mode == "PAUSE":
+            draw_world(canvas, background, terrain, tanks)
+            hud_data = {
+                "turn": 0,
+                "p1_hp": tanks[0]["hp"],
+                "p2_hp": tanks[1]["hp"],
+                "angle": tanks[0]["angle"],
+                "power": power,
+                "wind": wind,
+                "weapon": weapon,
+            }
+            hud_texts = hud_overlay.draw(canvas, hud_data)
+            pause_texts = pause_overlay.draw(canvas)
+            display.present(canvas, hud_texts + pause_texts)
+
         clock.tick(C.FPS)
 
     display.close()
