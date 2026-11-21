@@ -1,77 +1,87 @@
 # Peaceful War
 
-لعبة مدفعية **turn-based** زي Pocket Tanks / Tank Stars: دبابتين على تضاريس، تظبيط زاوية وقوة، إطلاق، حفر، ضرر.
-وكل بكسل على الشاشة بيتكتب بخوارزميات الكتاب (IT311) — مفيش `pygame.draw.*` ولا أي دالة رسم جاهزة.
-
-**الفريق:** 8 أفراد · **المدة:** أسبوعين · **التقنية:** Python + pygame-ce (نافذة/إدخال/توقيت/نص فقط)
-
-> **جديد في الفريق؟ ابدأ من [`docs/TEAM.md`](docs/TEAM.md)** — فيه كل حاجة في ملف واحد.
+A retro turn-based 2D artillery game built from scratch using fundamental Computer Graphics algorithms. Every visual element—lines, circles, curves, fills, and destructible terrain—is rasterized pixel-by-pixel onto a custom software canvas without using high-level drawing libraries (zero `pygame.draw.*`).
 
 ---
 
-## التشغيل
+## Features
+
+- **Software Rasterization:** Pure software-rendered graphics buffer at a native 640×360 resolution with clean integer scaling.
+- **Classic Graphics Algorithms:**
+  - **Lines:** Direct, DDA, Bresenham.
+  - **Curves & Circles:** Midpoint Circle, Polar Circle, Ellipse, Hermite Curves.
+  - **Filling:** Scan-line polygon filling and procedural gradient fills.
+- **Destructible Terrain:** Dynamic procedural heightmap with real-time explosion carving and terrain deformation.
+- **Artillery Mechanics:** Ballistic trajectory physics (gravity, wind), angle/power adjustments, and turn-based combat.
+
+---
+
+## Quickstart
+
+### Prerequisites
+- Python 3.11+
+
+### Installation & Run
 
 ```bash
+# Clone the repository
+git clone https://github.com/zexorion/peaceful_war.git
+cd peaceful_war
+
+# Setup virtual environment
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python main.py
+
+# On Linux / macOS:
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+
+# On Windows:
+.venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
 ```
 
-- `F11` فولسكرين · `ESC` خروج · `←/→` تصويب (في الـ Slice 0).
-- لقطة من غير نافذة: `.venv/bin/python main.py --shot out/slice0.png`
-- الاختبارات: `.venv/bin/python -m unittest discover -s tests -t .`
+### Additional Commands
 
-> **الوضع الحالي: Slice 0 (هيكل شغال).** النافذة + Canvas + تضاريس + دبابتين + HUD.
-> مش اللعبة بعد — دي نقطة البداية اللي كل تاسك هيبني عليها. شوف [PLAN.md](PLAN.md).
+- **Run tests:**
+  ```bash
+  python -m unittest discover -s tests -t .
+  ```
+- **Capture headless frame:**
+  ```bash
+  python main.py --shot out/screenshot.png
+  ```
 
 ---
 
-## الهيكل
+## Controls
 
-```
-config.py            كل الأرقام والألوان المشتركة (مصدر واحد)
-core/
-  canvas.py          الـ bytearray والـ set_pixel — الطبقة الوحيدة اللي بتكتب بكسل
-  display.py         pygame: النافذة، التكبير، الفولسكرين، النص
-  util.py            clamp / lerp / rotate
-algo/
-  lines.py           Ch2 — Bresenham فقط (Direct + DDA + المنقّط: Task 1)
-  circles.py         Ch3 — فاضي عمدًا: Task 1 بيكتبه كله
-  curves.py          Ch4 — يبدأ فاضي (Task 2)
-  fill.py            Ch5 — يبدأ فاضي (Task 2)
-world/
-  terrain.py         heightmap + render (+ carve لاحقًا)
-  physics.py         (Task 3)
-  weapons.py         (Task 3)
-game/                (Task 3)
-ui/                  (Task 4)
-tests/               unittest لكل موديول
-assets/              خطوط/أيقونات/لقطات
-docs/
-  CONTRACT.md        العقد التقني بين الفرق — يُقرأ قبل أي كود
-  TASKS_BRIEF.md     التاسكات الأربعة باختصار — للاختيار
-  KICKOFF.md         أجندة الـ kickoff + ورقة التوزيع (للقائد)
-  TASKS.md           تقسيم الشغل 4×2 بالتفصيل
+| Key | Action |
+| --- | --- |
+| `←` / `→` | Adjust barrel aim angle |
+| `Space` | Fire projectile |
+| `F11` | Toggle Fullscreen |
+| `ESC` | Quit |
+
+---
+
+## Project Structure
+
+```text
+peaceful_war/
+├── main.py              # Application entry point & game loop
+├── config.py            # Global constants, colors, and configuration
+├── core/                # Low-level canvas, buffer management, display scaler
+├── algo/                # Graphics algorithms (lines, circles, curves, fills)
+├── world/               # Terrain generation, destruction, and physics
+├── game/                # State machine and turn-based game loop
+├── ui/                  # HUD and screen management
+└── tests/               # Unit and algorithm verification tests
 ```
 
-## مين بيملك إيه
+---
 
-| المجلد | Task |
-|---|---|
-| `core/`, `algo/lines.py`, `algo/circles.py`, `tests/` | 1 — Engine |
-| `algo/curves.py`, `algo/fill.py`, `world/terrain.py` | 2 — Terrain |
-| `main.py`, `game/`, `world/physics.py`, `world/weapons.py` | 3 — Core |
-| `ui/`, `assets/`, `docs/` | 4 — UI/UX |
+## Core Rule
 
-## المستندات
-
-- **[PLAN.md](PLAN.md)** — القرارات، الـ scope، التقسيم، الجدول، المخاطر.
-- **[docs/TASKS_BRIEF.md](docs/TASKS_BRIEF.md)** — التاسكات الأربعة في صفحة واحدة (للاختيار).
-- **[docs/KICKOFF.md](docs/KICKOFF.md)** — أجندة 30 دقيقة + ورقة التوزيع + أول commit لكل تاسك.
-- **[docs/TASKS.md](docs/TASKS.md)** — ورق كل تاسك (يتنسخ للجروب زي ما هو).
-- **[docs/CONTRACT.md](docs/CONTRACT.md)** — التوقيعات وقواعد الكود. **إلزامي.**
-
-## القاعدة الذهبية
-
-`Canvas` بس هي اللي بتكتب بكسل. الـ algorithms مالهاش أي منطق لعبة. واللعبة عمرها ما بتنادي رسم مباشر.
-النص هو الاستثناء الوحيد المتفق عليه (خط جاهز عبر `pygame.font`).
+All graphics must be plotted via `core/canvas.py` (`Canvas.set_pixel` and low-level spans). External drawing wrappers like `pygame.draw` are strictly prohibited. Pygame is utilized solely for window management, user input handling, and font rendering.
