@@ -31,8 +31,11 @@ import sys
 import pygame
 
 import config as C
-from algo.lines import line_bresenham
+from algo.circles import circle_midpoint, disc_midpoint, ellipse_midpoint
+from algo.lines import line_bresenham, line_dda_dotted
 from core.canvas import Canvas
+
+
 from core.display import Display
 from core.util import clamp, lerp_color
 from world.terrain import Terrain
@@ -53,9 +56,17 @@ def draw_stars(cv, count=90, seed=3):
         cv.blend_pixel(x, y, C.STAR, rng.randrange(60, 220))
 
 
+def draw_moon(cv, cx=520, cy=65, r=22):
+    """Draw the moon and its outer glow ring using Task 1 midpoint algorithms."""
+    disc_midpoint(cv, cx, cy, r, C.MOON)
+    circle_midpoint(cv, cx, cy, r + 2, C.MOON_RING)
+
+
 def build_sky(cv):
     draw_sky(cv)
     draw_stars(cv)
+    draw_moon(cv)
+
 
 
 def rebuild_background(cv, terrain, sky):
@@ -74,6 +85,9 @@ def rebuild_background(cv, terrain, sky):
 def draw_tank(cv, x, y, angle, color):
     x = int(x)
     y = int(y)
+    # Shadow under the tank using Midpoint Ellipse (Task 1)
+    ellipse_midpoint(cv, x, y, 14, 3, (16, 12, 20))
+
     cv.rect(x - 11, y - 5, 22, 5, C.TRACK)
     for tx in range(x - 10, x + 10, 4):
         cv.set_pixel(tx, y - 4, (58, 48, 56))
@@ -84,6 +98,12 @@ def draw_tank(cv, x, y, angle, color):
     bx = x + math.cos(rad) * 12
     by = y - 12 - math.sin(rad) * 12
     line_bresenham(cv, x, y - 11, bx, by, color)
+
+    # Aim guide using Dotted DDA (Task 1)
+    gx = x + math.cos(rad) * 42
+    gy = y - 12 - math.sin(rad) * 42
+    line_dda_dotted(cv, bx, by, gx, gy, C.AIM, gap=4)
+
 
 
 def draw_world(cv, background, terrain, tanks):
